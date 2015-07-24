@@ -92,7 +92,22 @@ static int modSearch(duk_context *ctx)
 	struct prg *prg;
 	prg = prg_call;
 
+	/* Duktape.modSearch = function (id, require, exports, module) */
 	const char *id = duk_to_string(ctx, 0);
+
+	/*
+	 * To support the native module case, the module search function can also return undefined
+	 * (or any non-string value), in which case Duktape will assume that the module was found
+	 * but has no Ecmascript source to execute. Symbols written to exports in the module search
+	 * function are the only symbols provided by the module.
+	 */
+	// FIXME: Return builtin modules as symbols in the exports object
+
+	/*
+	 * If a module is found, the module search function can return a string providing the source
+	 * code for the module. Duktape will then take care of compiling and executing the module code
+	 * so that module symbols get registered into the exports object.
+	 */
 	for(mod=prg->modules;mod;mod=mod->next) {
 		if(!strcmp(mod->name, id)) {
 			duk_push_lstring(ctx, mod->buf, mod->size);
