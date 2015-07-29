@@ -1,6 +1,6 @@
 "use strict";
-var Db=LMDB1;
-var Sys=Sys1;
+var Db=require('#LMDB1');
+var Sys=require('#Sys1');
 
 var env = {}, rc;
 rc = Db.env_create(env);
