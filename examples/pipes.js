@@ -1,4 +1,4 @@
-Sys=Sys1;
+Sys=require('#Sys1');
 
 fds = Sys.pipe();
 Sys.dprint(1, fds.rc + "\n");

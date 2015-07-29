@@ -1,4 +1,4 @@
-Sys=Sys1;
+Sys=require('#Sys1');
 
 pid = Sys.clone(Sys.CLONE_NEWPID);
 

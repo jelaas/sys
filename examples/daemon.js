@@ -1,4 +1,4 @@
-var Sys=Sys1;
+var Sys=require('#Sys1');
 
 pid = Sys.fork();
 if(pid > 0) {

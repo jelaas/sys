@@ -1,4 +1,4 @@
-Sys=Sys1;
+Sys=require('#Sys1');
 
 fd = Sys.open('/etc/passwd', Sys.O_RDONLY, 0);
 len = Sys.lseek(fd, 0, Sys.SEEK_END);

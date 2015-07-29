@@ -1,4 +1,4 @@
-Sys=Sys1;
+Sys=require('#Sys1');
 
 Sys.dprint(1, "main1\n");
 

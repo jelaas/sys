@@ -1,4 +1,4 @@
-Sys=Sys1;
+Sys=require('#Sys1');
 
 fd = Sys.socket(Sys.AF_INET, Sys.SOCK_STREAM, Sys.IPPROTO_TCP);
 Sys.setsockopt(fd, Sys.SOL_SOCKET, Sys.SO_REUSEADDR, 1);

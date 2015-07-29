@@ -1,4 +1,4 @@
-Sys=Sys1;
+Sys=require('#Sys1');
 
 Sys.dprint(0, JSON.stringify(Sys.localtime(Sys.time())));
 

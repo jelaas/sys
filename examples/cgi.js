@@ -1,7 +1,7 @@
 "use strict";
 
-var Sys=Sys1;
-var CGI=Http1.CGI;
+var Sys=require('#Sys1');
+var CGI=require('#Http1').CGI;
 
 CGI.init();
 CGI.header("Content-Type: text/html");

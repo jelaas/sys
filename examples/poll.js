@@ -1,4 +1,4 @@
-Sys=Sys1;
+Sys=require('#Sys1');
 var fds = [ { fd: 0, events: Sys.POLLIN, a: 11 } ];
 
 while(1) {
