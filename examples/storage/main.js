@@ -1,5 +1,5 @@
-Sys=Sys1;
-Prg=Prg1;
+Sys=require('#Sys1');
+Prg=require('#Prg1');
 
 function main()
 {
