@@ -1,6 +1,6 @@
 /*
- * File: cgijs.c
- * Implements: javascript vm (duktape) with HTTP CGI extensions and lmdb support
+ * File: sys.c
+ * Implements: javascript vm (duktape) with system extensions
  *
  * Copyright: Jens Låås, 2014 - 2015
  * Copyright license: According to GPL, see file COPYING in this directory.
@@ -57,9 +57,23 @@ static void print_error(duk_context *ctx, FILE *f) {
 	duk_pop(ctx);
 }
 
+static struct native_mod native_modules[] = {
+#ifdef COMPSYS
+	{ "#Sys1", sys1_load },
+#endif
+#ifdef COMPLMDB
+	{ "#LMDB1", db1_load },
+#endif
+#ifdef COMPHTTP
+	{ "#Http1", http1_load },
+#endif
+	{ "#Prg1", prg1_load },
+	{ (void*)0, (void*)0 }
+};
+
 int main(int argc, char **argv)
 {
-	int i, rc;
+	int rc;
 	
 	prg.argc = argc;
 	prg.argv = argv;
@@ -68,37 +82,7 @@ int main(int argc, char **argv)
 	duk_context *ctx = duk_create_heap_default();
 
 	duk_push_global_object(ctx);
-
-#ifdef COMPSYS
-	duk_push_object(ctx);  /* -> [ ... global obj ] */
-	sys1(ctx);
-	for(i=1;i<argc;i++) {
-		duk_push_string(ctx, argv[i]);
-		duk_put_prop_index(ctx, -2, i-1);
-	}
-	duk_push_number(ctx, argc-1);
-	duk_put_prop_string(ctx, -2, "argc");
-	duk_put_prop_string(ctx, -2, "Sys1");  /* -> [ ... global ] */
-#endif
-	
-#ifdef COMPLMDB
-	duk_push_object(ctx);  /* -> [ ... global obj ] */
-	db1(ctx);
-	duk_put_prop_string(ctx, -2, "LMDB1");  /* -> [ ... global ] */
-#endif
-
-#ifdef COMPHTTP
-	duk_push_object(ctx);  /* -> [ ... global obj ] */
-	http1(ctx);
-	duk_put_prop_string(ctx, -2, "Http1");  /* -> [ ... global ] */
-#endif
-
-	duk_push_object(ctx);  /* -> [ ... global obj ] */
-	prg1(ctx);
-	duk_put_prop_string(ctx, -2, "Prg1");  /* -> [ ... global ] */
-
 	prg_push_modsearch(ctx);
-	
 	duk_pop(ctx);
 
 	prg_parse_appfile(&prg);
@@ -108,7 +92,7 @@ int main(int argc, char **argv)
 	duk_push_string(ctx, argv[1]);
 
 	// execute file (compile + call)
-	prg_register(&prg);
+	prg_register(&prg, native_modules);
 	rc = duk_safe_call(ctx, prg_wrapped_compile_execute, 2 /*nargs*/, 1 /*nret*/);
 	if (rc != DUK_EXEC_SUCCESS) {
 		print_error(ctx, stderr);

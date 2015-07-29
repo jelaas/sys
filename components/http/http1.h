@@ -1,4 +1,6 @@
 #ifndef HTTP1_H
 #define HTTP1_H
-int http1(duk_context *ctx);
+#include "prg.h"
+
+int http1_load(duk_context *ctx, int n, struct prg *prg);
 #endif

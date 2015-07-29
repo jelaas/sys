@@ -576,10 +576,10 @@ static const duk_number_list_entry db1_consts[] = {
 	{ NULL, 0.0 }
 };
 
-int db1(duk_context *ctx)
+int db1_load(duk_context *ctx, int n, struct prg *prg)
 {
-	duk_put_function_list(ctx, -1, db1_funcs);
-	duk_put_number_list(ctx, -1, db1_consts);
+	duk_put_function_list(ctx, n, db1_funcs);
+	duk_put_number_list(ctx, n, db1_consts);
 	return 0;
 }
 

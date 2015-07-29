@@ -1,4 +1,5 @@
 #ifndef DB1_H
 #define DB1_H
-int db1(duk_context *ctx);
+#include "prg.h"
+int db1_load(duk_context *ctx, int n, struct prg *prg);
 #endif

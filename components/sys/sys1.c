@@ -27,9 +27,9 @@
 #include <netpacket/packet.h>
 #include <net/ethernet.h>
 
-//#include <stdio.h>
 #include "duktape.h"
 #include "sys1.h"
+#include "prg.h"
 
 static int sys1_push_stat(duk_context *ctx, struct stat *stat)
 {
@@ -1076,9 +1076,19 @@ static const duk_number_list_entry sys1_consts[] = {
 	{ NULL, 0.0 }
 };
 
-int sys1(duk_context *ctx)
+int sys1_load(duk_context *ctx, int n, struct prg *prg)
 {
-	duk_put_function_list(ctx, -1, sys1_funcs);
-	duk_put_number_list(ctx, -1, sys1_consts);
+	int i;
+	
+	duk_put_function_list(ctx, n, sys1_funcs);
+	duk_put_number_list(ctx, n, sys1_consts);
+	
+	for(i=1;i<prg->argc;i++) {
+		duk_push_string(ctx, prg->argv[i]);
+		duk_put_prop_index(ctx, n, i-1);
+	}
+	duk_push_number(ctx, prg->argc-1);
+	duk_put_prop_string(ctx, n, "argc");
+	
 	return 0;
 }

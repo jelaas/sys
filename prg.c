@@ -17,10 +17,12 @@
 #include "prg.h"
 
 static struct prg *prg_call;
+static struct native_mod *prg_native_modules;
 
-int prg_register(struct prg *prg)
+int prg_register(struct prg *prg, struct native_mod *native_modules)
 {
 	prg_call = prg;
+	prg_native_modules = native_modules;
 	return 0;
 }
 
@@ -86,13 +88,27 @@ int prg_wrapped_compile_execute(duk_context *ctx) {
 	return 0; // no values returned (0)
 }
 
+static int x(duk_context *ctx)
+{
+	duk_push_string(ctx, "hello from x");
+	return 1;
+}
+
+static const duk_function_list_entry x_funcs[] = {
+	{ "x", x, 0 /* fd */ },
+	{ NULL, NULL, 0 }
+};
+
+
+/* Duktape.modSearch = function (id, require, exports, module) */
 static int modSearch(duk_context *ctx)
 {
 	struct mod *mod;
 	struct prg *prg;
+	int i;
+	
 	prg = prg_call;
 
-	/* Duktape.modSearch = function (id, require, exports, module) */
 	const char *id = duk_to_string(ctx, 0);
 
 	/*
@@ -101,7 +117,20 @@ static int modSearch(duk_context *ctx)
 	 * but has no Ecmascript source to execute. Symbols written to exports in the module search
 	 * function are the only symbols provided by the module.
 	 */
-	// FIXME: Return builtin modules as symbols in the exports object
+	for(i=0;;i++) {
+		if(!prg_native_modules[i].name) break;
+		if(!strcmp(id, prg_native_modules[i].name)) {
+			prg_native_modules[i].fn(ctx, 2, prg);
+			duk_push_undefined(ctx);
+			return 1;
+		}
+	}
+
+	if(!strcmp(id, "x")) {
+		duk_put_function_list(ctx, 2, x_funcs);
+		duk_push_undefined(ctx);
+		return 1;
+	}
 
 	/*
 	 * If a module is found, the module search function can return a string providing the source
@@ -122,7 +151,7 @@ static int modSearch(duk_context *ctx)
 int prg_push_modsearch(duk_context *ctx)
 {
 	duk_get_prop_string(ctx, -1, "Duktape");
-	duk_push_c_function(ctx, modSearch, 1);
+	duk_push_c_function(ctx, modSearch, 4);
 	duk_put_prop_string(ctx, -2, "modSearch");
 	duk_pop(ctx); // pop Duktape
 	return 0;
@@ -306,9 +335,9 @@ static const duk_number_list_entry prg1_consts[] = {
 	{ NULL, 0.0 }
 };
 
-int prg1(duk_context *ctx)
+int prg1_load(duk_context *ctx, int n, struct prg *prg)
 {
-	duk_put_function_list(ctx, -1, prg1_funcs);
-	duk_put_number_list(ctx, -1, prg1_consts);
+	duk_put_function_list(ctx, n, prg1_funcs);
+	duk_put_number_list(ctx, n, prg1_consts);
 	return 0;
 }
