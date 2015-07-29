@@ -5,7 +5,7 @@ C_SYS=components/sys/sys1.o
 sys:	sys.o prg.o $(C_SYS) components/http/http1.o components/lmdb/db1.o duktape.o liblmdb.a
 liblmdb.a:	components/lmdb/mdb.o components/lmdb/midl.o
 	ar rs $@ components/lmdb/mdb.o components/lmdb/midl.o
-README.md:
+README.md:	HEAD.md
 	cat HEAD.md > README.md
 	examples/genexamples.sh >> README.md
 clean:
